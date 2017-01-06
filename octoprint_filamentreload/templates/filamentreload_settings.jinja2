@@ -1,0 +1,27 @@
+<h4>{{ _('Filament Sensor') }}</h4>
+Define the pin used by your sensor and the debounce timing for false positive prevention.
+<br>
+<form class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label">{{ _('Pin:') }}</label>
+        <div class="controls" data-toggle="tooltip" title="{{ _('Which GPIO pin your switch is attached to') }}">
+            <input type="number" step="any" min="0" class="input-mini text-right" data-bind="value: settings.plugins.filamentreload.pin">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">{{ _('Debounce Time:') }}</label>
+        <div class="controls" data-toggle="tooltip" title="{{ _('The amount of time a signal needs to stay constant to be considered valid') }}">
+            <input type="number" step="any" min="0" class="input-mini text-right" data-bind="value: settings.plugins.filamentreload.bounce">
+            <span class="add-on">ms</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">{{ _('Switch Type:') }}</label>
+        <div class="controls" data-toggle="tooltip" title="{{ _('Whether the sensor should trip when the switch goes HIGH or LOW, Normally Open is LOW when filament is present, and Normally Closed is HIGH when filament is present') }}">
+            <select class="select-mini" data-bind="value: settings.plugins.filamentreload.switch">
+                <option value=0>{{ _('Normally Open') }}</option>
+                <option value=1>{{ _('Normally Closed') }}</option>
+            </select>
+        </div>
+    </div>
+</form>

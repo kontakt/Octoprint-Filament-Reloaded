@@ -12,3 +12,5 @@ or manually using this URL:
     https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/master.zip
 
 Using this plugin requires a filament sensor. The code is set to use the Raspberry Pi's internal Pull-Up resistors, so the switch should be between your detection pin and a ground pin.
+
+This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs to be selected by the physical pin number.

@@ -24,7 +24,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         self.bounce = int(self._settings.get(["bounce"]))
         self.switch = int(self._settings.get(["switch"]))
 
-        if self._settings.get(["pin"]) != -1:   # If a pin is defined
+        if self._settings.get(["pin"]) != "-1":   # If a pin is defined
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Initialize GPIO as INPUT
 

@@ -19,12 +19,20 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         GPIO.setmode(GPIO.BOARD)       # Use the board numbering scheme
         GPIO.setwarnings(False)        # Disable GPIO warnings
 
+    @property
+    def pin(self):
+        return int(self._settings.get(["pin"]))
+
+    @property
+    def bounce(self):
+        return int(self._settings.get(["bounce"]))
+
+    @property
+    def switch(self):
+        return int(self._settings.get(["switch"]))
+
     def on_after_startup(self):
         self._logger.info("Filament Sensor Reloaded started")
-        self.pin = int(self._settings.get(["pin"]))
-        self.bounce = int(self._settings.get(["bounce"]))
-        self.switch = int(self._settings.get(["switch"]))
-
         if self._settings.get(["pin"]) != "-1":   # If a pin is defined
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Initialize GPIO as INPUT

@@ -5,6 +5,7 @@ import octoprint.plugin
 from octoprint.events import eventManager, Events
 from flask import jsonify, make_response
 import RPi.GPIO as GPIO
+from time import sleep
 
 class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.EventHandlerPlugin,
@@ -42,6 +43,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         if event == Events.PRINT_STARTED:  # If a new print is beginning
             self._logger.info("Printing started: Filament sensor enabled")
             if self.pin != -1:
+                GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(self.pin, GPIO.BOTH, callback=self.check_gpio, bouncetime=self.bounce)
         elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
             self._logger.info("Printing stopped: Filament sensor disabled")
@@ -51,6 +53,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 pass
 
     def check_gpio(self, channel):
+        sleep(self.bounce/1000)
         state = GPIO.input(self.pin)
         self._logger.debug("Detected sensor [%s] state [%s]"%(channel, state))
         if state != self.switch:    # If the sensor is tripped

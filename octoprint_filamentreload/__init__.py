@@ -36,6 +36,8 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         if self._settings.get(["pin"]) != "-1":   # If a pin is defined
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Initialize GPIO as INPUT
+        else:
+            self._logger.info("Pin not configured, won't work unless configured!")
 
     def get_settings_defaults(self):
         return dict(
@@ -74,11 +76,14 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def check_gpio(self, channel):
         sleep(self.bounce/1000)
         state = GPIO.input(self.pin)
-        self._logger.debug("Detected sensor [%s] state [%s]"%(channel, state))
         if state != self.switch:    # If the sensor is tripped
-            self._logger.debug("Sensor [%s]"%state)
+            self._logger.info("Out of filament!")
             if self._printer.is_printing():
+                self._logger.info("Pausing print.")
                 self._printer.toggle_pause_print()
+        else:
+            self._logger.info("Filament detected!")
+
 
     def get_update_information(self):
         return dict(

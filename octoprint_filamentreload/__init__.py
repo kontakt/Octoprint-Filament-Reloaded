@@ -58,6 +58,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             self._logger.info("Printing: Filament sensor enabled")
             if self.pin != -1:
                 GPIO.remove_event_detect(self.pin)
+                self.check_gpio(self.pin)
                 GPIO.add_event_detect(self.pin, GPIO.BOTH, callback=self.check_gpio, bouncetime=self.bounce)
         # Not printing
         elif event in (
@@ -73,7 +74,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             except Exception:
                 pass
 
-    def check_gpio(self, channel):
+    def check_gpio(self, _):
         sleep(self.bounce/1000)
         state = GPIO.input(self.pin)
         if state != self.switch:    # If the sensor is tripped

@@ -48,13 +48,24 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         return [dict(type="settings", custom_bindings=False)]
 
     def on_event(self, event, payload):
-        if event == Events.PRINT_STARTED:  # If a new print is beginning
-            self._logger.info("Printing started: Filament sensor enabled")
+        # Printing
+        if event in (
+            Events.PRINT_STARTED,
+            Events.PRINT_RESUMED
+        ):
+            self._logger.info("Printing: Filament sensor enabled")
             if self.pin != -1:
                 GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(self.pin, GPIO.BOTH, callback=self.check_gpio, bouncetime=self.bounce)
-        elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
-            self._logger.info("Printing stopped: Filament sensor disabled")
+        # Not printing
+        elif event in (
+            Events.PRINT_DONE,
+            Events.PRINT_FAILED,
+            Events.PRINT_CANCELLED,
+            Events.PRINT_PAUSED,
+            Events.ERROR
+        ):
+            self._logger.info("Not printing: Filament sensor disabled")
             try:
                 GPIO.remove_event_detect(self.pin)
             except Exception:

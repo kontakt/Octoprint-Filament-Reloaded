@@ -31,6 +31,14 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def switch(self):
         return int(self._settings.get(["switch"]))
 
+    @property
+    def after_pause_gcode(self):
+        return str(self._settings.get(["after_pause_gcode"])).splitlines()
+
+    @property
+    def filament_detected_gcode(self):
+        return str(self._settings.get(["filament_detected_gcode"])).splitlines()
+
     def on_after_startup(self):
         self._logger.info("Filament Sensor Reloaded started")
         if self._settings.get(["pin"]) != "-1":   # If a pin is defined
@@ -43,7 +51,9 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         return dict(
             pin     = -1,   # Default is no pin
             bounce  = 250,  # Debounce 250ms
-            switch  = 0    # Normally Open
+            switch  = 0,    # Normally Open
+            after_pause_gcode = '',
+            filament_detected_gcode = '',
         )
 
     def get_template_configs(self):
@@ -65,7 +75,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             Events.PRINT_DONE,
             Events.PRINT_FAILED,
             Events.PRINT_CANCELLED,
-            Events.PRINT_PAUSED,
             Events.ERROR
         ):
             self._logger.info("Not printing: Filament sensor disabled")
@@ -77,14 +86,19 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def check_gpio(self, _):
         sleep(self.bounce/1000)
         state = GPIO.input(self.pin)
-        if state != self.switch:    # If the sensor is tripped
-            self._logger.info("Out of filament!")
-            if self._printer.is_printing():
-                self._logger.info("Pausing print.")
-                self._printer.toggle_pause_print()
+        if state != self.switch:
+            self._logger.info("Out of filament, pausing!")
+            self._printer.pause_print()
+            if self.after_pause_gcode:
+                self._logger.info("Sending after pause GCODE")
+                self._printer.commands(self.after_pause_gcode)
+            self._filament_change = True
         else:
             self._logger.info("Filament detected!")
-
+            if getattr(self, '_filament_change', False):
+                self._logger.info("Sending filament detected GCODE!")
+                self._printer.commands(self.filament_detected_gcode)
+                self._filament_change = False
 
     def get_update_information(self):
         return dict(

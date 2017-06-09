@@ -67,7 +67,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     @property
     def _filament_change(self):
-         return getattr(self, '_filament_change', False)
+        return self.__dict__.get('_filament_change', False)
 
     def on_event(self, event, payload):
         # Early abort in case of out ot filament when start printing, as we

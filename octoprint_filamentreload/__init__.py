@@ -65,6 +65,19 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             after_resume_gcode = '',
         )
 
+    def on_settings_save(self, data):
+        octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+
+        if self.mode == 0:
+            GPIO.setmode(GPIO.BOARD)
+        else:
+            GPIO.setmode(GPIO.BCM)
+
+        if self._settings.get(["pin"]) != "-1":   # If a pin is defined
+            self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
+            GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Initialize GPIO as INPUT
+
+
     def sensor_enabled(self):
         return self.pin != -1
 

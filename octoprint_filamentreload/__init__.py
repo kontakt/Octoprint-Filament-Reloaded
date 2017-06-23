@@ -32,6 +32,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         return int(self._settings.get(["switch"]))
 
     @property
+    def mode(self):
+        return int(self._settings.get(["mode"]))
+
+    @property
     def after_pause_gcode(self):
         return str(self._settings.get(["after_pause_gcode"])).splitlines()
 
@@ -52,6 +56,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             pin     = -1,   # Default is no pin
             bounce  = 250,  # Debounce 250ms
             switch  = 0,    # Normally Open
+            mode    = 0     # Board Mode
             after_pause_gcode = '',
             after_resume_gcode = '',
         )

@@ -42,6 +42,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def pause_print(self):
         return self._settings.get_boolean(["pause_print"])
 
+    @property
+    def send_gcode_only_once(self):
+        return self._settings.get_boolean(["send_gcode_only_once"])
+
     def _setup_sensor(self):
         if self.sensor_enabled():
             self._logger.info("Setting up sensor.")
@@ -68,6 +72,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             mode    = 0,    # Board Mode
             no_filament_gcode = '',
             pause_print = True,
+            send_gcode_only_once = False, # Default set to False for backward compatibility
         )
 
     def on_settings_save(self, data):
@@ -116,6 +121,9 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         sleep(self.bounce/1000)
         if self.no_filament():
             self._logger.info("Out of filament!")
+            if self.send_gcode_only_once:
+                self._logger.info("Sending GCODE only once...removing filament sensor callback.")
+                GPIO.remove_event_detect(self.pin)
             if self.pause_print:
                 self._logger.info("Pausing print.")
                 self._printer.pause_print()

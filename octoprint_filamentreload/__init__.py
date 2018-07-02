@@ -89,6 +89,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         if event is Events.PRINT_STARTED and self.no_filament():
             self._logger.info("Printing aborted: no filament detected!")
             self._printer.cancel_print()
+
         # Enable sensor
         if event in (
             Events.PRINT_STARTED,
@@ -124,7 +125,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self._logger.info("Sending out of filament GCODE")
                 self._printer.commands(self.no_filament_gcode)
         else:
-            self._logger.info("Filament detected!")
+            self._logger.info("Filament present")
 
     def get_update_information(self):
         return dict(
@@ -134,17 +135,17 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
                 # version check: github repository
                 type="github_release",
-                user="kontakt",
+                user="Floyz",
                 repo="Octoprint-Filament-Reloaded",
                 current=self._plugin_version,
 
                 # update method: pip
-                pip="https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
+                pip="https://github.com/Floyz/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
             )
         )
 
 __plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.0.1"
+__plugin_version__ = "1.0.1b"
 
 def __plugin_load__():
     global __plugin_implementation__

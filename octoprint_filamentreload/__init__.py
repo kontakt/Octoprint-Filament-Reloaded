@@ -12,6 +12,8 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin):
 
+    last_state = 2 #0 no filamenet , 1 filament present, 2 init
+
     def initialize(self):
         self._logger.info("Running RPi.GPIO version '{0}'".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":       # Need at least 0.6 for edge detection
@@ -115,17 +117,26 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             GPIO.remove_event_detect(self.pin)
 
     def sensor_callback(self, _):
+        global last_state
         sleep(self.bounce/1000)
         if self.no_filament():
-            self._logger.info("Out of filament!")
+            state = 0
+            if state != last_state:
+                self._logger.info("Out of filament!")
+                last_state = 0
             if self.pause_print:
                 self._logger.info("Pausing print.")
                 self._printer.pause_print()
+                GPIO.remove_event_detect(self.pin)
             if self.no_filament_gcode:
                 self._logger.info("Sending out of filament GCODE")
                 self._printer.commands(self.no_filament_gcode)
+                GPIO.remove_event_detect(self.pin)
         else:
-            self._logger.info("Filament present")
+            state = 1
+            if state != last_state:
+                self._logger.info("Filament present")
+                last_state = 1
 
     def get_update_information(self):
         return dict(
@@ -145,7 +156,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.0.1b"
+__plugin_version__ = "1.0.1c"
 
 def __plugin_load__():
     global __plugin_implementation__

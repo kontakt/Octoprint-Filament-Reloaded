@@ -14,20 +14,20 @@ plugin_package = "octoprint_filamentreload"
 plugin_name = "Octoprint-FilamentReload"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "1.0.1"
+plugin_version = "1.0.1b"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
 plugin_description = """A revamped and rewritten filament monitor that pauses the print when your filament runs out"""
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
-plugin_author = "Connor Huffine"
+plugin_author = "Floy"
 
 # The plugin's author's mail address.
-plugin_author_email = "chuffine@gmail.com"
+plugin_author_email = "fcoquelet@gmail.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/kontakt/Octoprint-Filament-Reloaded"
+plugin_url = "https://github.com/Floyz/Octoprint-Filament-Reloaded"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"

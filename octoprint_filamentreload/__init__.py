@@ -12,8 +12,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin):
 
-    last_state = 2 #0 no filamenet , 1 filament present, 2 init
-
     def initialize(self):
         self._logger.info("Running RPi.GPIO version '{0}'".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":       # Need at least 0.6 for edge detection
@@ -117,7 +115,12 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             GPIO.remove_event_detect(self.pin)
 
     def sensor_callback(self, _):
-        global last_state
+
+        #init last_state
+        if 'last_state' in locals():
+        else
+            last_state=2 #0 no filamenet , 1 filament present, 2 init
+
         sleep(self.bounce/1000)
         if self.no_filament():
             state = 0
@@ -156,7 +159,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.0.1c"
+__plugin_version__ = "1.0.3"
 
 def __plugin_load__():
     global __plugin_implementation__

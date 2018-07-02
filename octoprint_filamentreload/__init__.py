@@ -107,6 +107,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             Events.PRINT_DONE,
             Events.PRINT_FAILED,
             Events.PRINT_CANCELLED,
+            Events.PRINT_PAUSED,
             Events.ERROR
         ):
             self._logger.info("%s: Disabling filament sensor." % (event))

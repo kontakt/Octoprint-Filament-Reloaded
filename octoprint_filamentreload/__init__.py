@@ -118,7 +118,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
         #init last_state
         if 'last_state' in locals():
-        else
+        else:
             last_state=2 #0 no filamenet , 1 filament present, 2 init
 
         sleep(self.bounce/1000)

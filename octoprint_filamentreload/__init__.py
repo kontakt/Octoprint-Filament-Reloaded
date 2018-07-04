@@ -102,6 +102,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             self._logger.info("%s: Enabling filament sensor." % (event))
             if self.sensor_enabled():
                 GPIO.remove_event_detect(self.pin)
+                self._logger.info("Filament present, print starting")
                 GPIO.add_event_detect(
                     self.pin, GPIO.BOTH,
                     callback=self.sensor_callback,
@@ -169,7 +170,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.0.5"
+__plugin_version__ = "1.0.6"
 
 def __plugin_load__():
     global __plugin_implementation__

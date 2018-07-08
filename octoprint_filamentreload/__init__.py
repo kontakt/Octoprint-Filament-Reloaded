@@ -130,6 +130,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             if self.state != self.last_state:
                 self._logger.info("Out of filament!")
                 self.last_state = 0
+                self._plugin_manager.send_plugin_message(self._identifier, dict(filamentStatus="empty"))
             if self.pause_print:
                 self._logger.info("Pausing print.")
                 self._printer.pause_print()
@@ -148,6 +149,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             if self.state != self.last_state:
                 self._logger.info("Filament present")
                 self.last_state = 1
+                self._plugin_manager.send_plugin_message(self._identifier, dict(filamentStatus="present"))
 
         self._logger.debug("Last State EndCB: %d" %self.last_state)
         self._logger.debug("State EndCB: %d" %self.state)

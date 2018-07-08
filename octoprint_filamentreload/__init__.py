@@ -84,8 +84,20 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def no_filament(self):
         return GPIO.input(self.pin) != self.switch
 
+    ##~~ AssetPlugin mixin
+
+	def get_assets(self):
+		return dict(
+			js=["js/filamentreload.js"],
+			css=["css/filamentreload.css"]
+		)
+
+
     def get_template_configs(self):
-        return [dict(type="settings", custom_bindings=False)]
+        return [
+            dict(type="navbar", custom_bindings=False),
+            dict(type="settings", custom_bindings=False)
+        ]
 
     def on_event(self, event, payload):
         # Early abort in case of out ot filament when start printing, as we

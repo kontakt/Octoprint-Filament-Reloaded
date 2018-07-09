@@ -120,7 +120,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                     #self.pin, GPIO.BOTH,
                     #callback=self.sensor_callback,
                     #bouncetime=self.bounce
-                )
+                #)
         # Disable sensor
         elif event in (
             Events.PRINT_DONE,

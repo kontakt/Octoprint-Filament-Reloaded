@@ -116,11 +116,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             if self.sensor_enabled():
                 #GPIO.remove_event_detect(self.pin)
                 self._logger.info("Filament present, print starting")
-                #GPIO.add_event_detect(
-                    #self.pin, GPIO.BOTH,
-                    #callback=self.sensor_callback,
-                    #bouncetime=self.bounce
-                #)
+                
         # Disable sensor
         elif event in (
             Events.PRINT_DONE,

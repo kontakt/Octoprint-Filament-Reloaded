@@ -7,10 +7,12 @@ $(function() {
 
 
         self.onDataUpdaterPluginMessage = function(plugin, data) {
-            if (plugin != "filamentreloaded") {
+            if (plugin != "filamentreload") {
+                window.alert("mauvais plugin: "+ plugin);
                 return;
             }
             self.updateIcon(data.filamentStatus);
+            window.alert("bon plugin: "+ data.filamentStatus);
             self.isConnected(data.isConnected);
         };
 
@@ -21,8 +23,8 @@ $(function() {
         }
 
 
-
-        OCTOPRINT_VIEWMODELS.push([
+    }
+    OCTOPRINT_VIEWMODELS.push([
         FilamentReloadedViewModel,
 
         // e.g. loginStateViewModel, settingsViewModel, ...

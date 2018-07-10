@@ -10,10 +10,21 @@ from time import sleep
 class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.EventHandlerPlugin,
                              octoprint.plugin.TemplatePlugin,
-                             octoprint.plugin.SettingsPlugin):
+                             octoprint.plugin.SettingsPlugin,
+                             octoprint.plugin.AssetPlugin):
 
     last_state=2  #0 no filamenet , 1 filament present, 2 init
     state=2
+
+    def updateIcon(self):
+        if self.last_state==0
+            self._plugin_manager.send_plugin_message(self._identifier, dict(filamentStatus="empty"))
+        elif self.last_state==1
+            self._plugin_manager.send_plugin_message(self._identifier, dict(filamentStatus="present"))
+        elif self.last_state==2
+            self._plugin_manager.send_plugin_message(self._identifier, dict(filamentStatus="unknown"))
+
+
 
     def initialize(self):
         self._logger.info("Running RPi.GPIO version '{0}'".format(GPIO.VERSION))

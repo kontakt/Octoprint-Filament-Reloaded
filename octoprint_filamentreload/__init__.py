@@ -94,9 +94,14 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             if self.filamentStatusWatcher.running == False:
-                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.last_state,self._logger)
+                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.state,self._logger)
                 self.filamentStatusWatcher.daemon = True
                 self.filamentStatusWatcher.start()
+                if self.no_filament():
+                    state=0
+                    pass
+                else:
+                    state=1
         else:
             self._logger.info("Pin not configured, won't work unless configured!")
 

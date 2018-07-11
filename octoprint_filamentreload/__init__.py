@@ -93,7 +93,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 GPIO.setmode(GPIO.BCM)
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            if filamentStatusWatcher.running == False:
+            if self.filamentStatusWatcher.running == False:
                 self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.last_state,self._logger)
                 self.filamentStatusWatcher.daemon = True
                 self.filamentStatusWatcher.start()

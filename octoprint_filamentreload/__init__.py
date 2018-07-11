@@ -98,10 +98,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self.filamentStatusWatcher.daemon = True
                 self.filamentStatusWatcher.start()
                 if self.no_filament():
-                    state=0
+                    self.state=0
                     pass
                 else:
-                    state=1
+                    self.state=1
         else:
             self._logger.info("Pin not configured, won't work unless configured!")
 

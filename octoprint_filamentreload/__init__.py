@@ -93,6 +93,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 GPIO.setmode(GPIO.BCM)
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            if filamentStatusWatcher.running == False:
+                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.last_state,self._logger)
+                self.filamentStatusWatcher.daemon = True
+                self.filamentStatusWatcher.start()
         else:
             self._logger.info("Pin not configured, won't work unless configured!")
 
@@ -135,6 +139,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         # Early abort in case of out ot filament when start printing, as we
         # can't change with a cold nozzle
         if event is Events.PRINT_STARTED and self.no_filament():
+            state=0
             self._logger.info("Printing aborted: no filament detected!")
             self._printer.cancel_print()
 
@@ -148,7 +153,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 state=0
                 pass
             else:
-                state=1         
+                state=1
                 self._logger.info("%s: Enabling filament sensor." % (event))
                 if self.sensor_enabled():
                     GPIO.remove_event_detect(self.pin)

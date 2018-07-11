@@ -1,4 +1,3 @@
-
 $(function() {
     function FilamentReloadedViewModel(parameters) {
         var self = this;
@@ -8,12 +7,10 @@ $(function() {
 
         self.onDataUpdaterPluginMessage = function(plugin, data) {
             if (plugin != "filamentreload") {
-                window.alert("mauvais plugin: "+ plugin);
                 return;
             }
             self.updateIcon(data.filamentStatus);
-            window.alert("bon plugin: "+ data.filamentStatus);
-            self.isConnected(data.isConnected);
+
         };
 
 

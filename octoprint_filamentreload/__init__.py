@@ -142,7 +142,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         if(self.filamentStatusWatcher.running):
             self._logger.debug("Stopping thread")
             self.filamentStatusWatcher.stopWatch()
-            self.filamentStatusWatcher.joint()
+            self.filamentStatusWatcher.join()
 
         sleep(0.5)
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)

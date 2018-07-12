@@ -103,13 +103,14 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
             if self.filamentStatusWatcher.running == False:
                 self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.state,self.checkrate,self._logger)
-                #self.filamentStatusWatcher.daemon = True
+                self.filamentStatusWatcher.daemon = True
                 self.filamentStatusWatcher.start()
 
                 if self.no_filament():
                     pass
             else:
-                self.filamentStatusWatcher.checkrate = self.checkrate()
+                self._logger.info("Setting new checkrate")
+                self.filamentStatusWatcher.wCheckRate = self.checkrate()
                 if self.no_filament():
                     pass
 
@@ -139,14 +140,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         )
 
     def on_settings_save(self, data):
-        if(self.filamentStatusWatcher.running):
-            self._logger.debug("Stopping thread")
-            self.filamentStatusWatcher.stopWatch()
-            self.filamentStatusWatcher.join()
-
-        sleep(0.5)
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
-        sleep(0.5)
         self._setup_sensor()
 
     def sensor_enabled(self):

@@ -35,8 +35,8 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 sleep(self.wCheckRate/1000)
 
         def stopWatch(self):
-            if running==True:
-                running=False
+            if self.running==True:
+                self.running=False
 
         def updateIcon(self):
             if self.wCurrentState==0:
@@ -139,7 +139,12 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         )
 
     def on_settings_save(self, data):
+        if(self.filamentStatusWatcher.running){
+            self.filamentStatusWatcher.stopWatch()
+        }
+        sleep(0.2)
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+        sleep(0.2)
         self._setup_sensor()
 
     def sensor_enabled(self):

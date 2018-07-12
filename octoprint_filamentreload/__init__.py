@@ -21,17 +21,18 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         def __init__(self):
             Thread.__init__(self)
 
-        def populate(self, wPluginManager, wIdentifier, wCurrentState, wLogger):
+        def populate(self, wPluginManager, wIdentifier, wCurrentState,wCheckRate, wLogger):
             self._logger=wLogger
             self.wPluginManager = wPluginManager
             self.wIdentifier = wIdentifier
             self.wCurrentState = wCurrentState
+            self.wCheckRate = wCheckRate
 
         def run(self):
             self.running= True
             while self.running==True:
                 self.updateIcon()
-                sleep(1)
+                sleep(self.wCheckRate/1000)
 
         def stopWatch(self):
             if running==True:
@@ -67,6 +68,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         return int(self._settings.get(["bounce"]))
 
     @property
+    def checkrate(self):
+        return int(self._settings.get(["checkrate"]))
+
+    @property
     def switch(self):
         return int(self._settings.get(["switch"]))
 
@@ -97,12 +102,17 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
             if self.filamentStatusWatcher.running == False:
-                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.state,self._logger)
+                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.state,self.checkrate,self._logger)
                 self.filamentStatusWatcher.daemon = True
                 self.filamentStatusWatcher.start()
 
                 if self.no_filament():
                     pass
+            else:
+                self.filamentStatusWatcher.checkrate = self.checkrate
+                if self.no_filament():
+                    pass
+
 
             GPIO.add_event_detect(
                 self.pin, GPIO.BOTH,
@@ -125,6 +135,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             mode    = 0,    # Board Mode
             no_filament_gcode = '',
             pause_print = True,
+            checkrate = 1500, #navbar icon check frequency
         )
 
     def on_settings_save(self, data):
@@ -138,7 +149,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         nofilament = GPIO.input(self.pin) != self.switch
         if nofilament:
             self.filamentStatusWatcher.wCurrentState=0
-            pass
         else:
             self.filamentStatusWatcher.wCurrentState=1
         return nofilament

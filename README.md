@@ -9,6 +9,7 @@ Initial work based on the [Octoprint-Filament](https://github.com/MoonshineSG/Oc
 ## Fork by Floyz:
 
 * Avoid multiple pause sent to printer when filament run out and minimize logs when GPIO events gets fired multiple times.
+* Added Icon in the nav bar to reflect filament detection status. (with check frequency in parameters)
 
 ## Required sensor
 

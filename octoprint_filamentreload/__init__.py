@@ -113,7 +113,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 if self.no_filament():
                     pass
 
-
+            GPIO.remove_event_detect(self.pin)
             GPIO.add_event_detect(
                 self.pin, GPIO.BOTH,
                 callback=self.sensor_callback,

@@ -109,7 +109,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 if self.no_filament():
                     pass
             else:
-                self.filamentStatusWatcher.checkrate = self.checkrate
+                self.filamentStatusWatcher.checkrate = self.checkrate()
                 if self.no_filament():
                     pass
 

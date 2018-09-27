@@ -5,18 +5,28 @@ import octoprint.plugin
 from octoprint.events import Events
 import RPi.GPIO as GPIO
 from time import sleep
+from flask import jsonify
 
 
 class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.EventHandlerPlugin,
                              octoprint.plugin.TemplatePlugin,
-                             octoprint.plugin.SettingsPlugin):
+                             octoprint.plugin.SettingsPlugin,
+                             octoprint.plugin.BlueprintPlugin):
 
     def initialize(self):
         self._logger.info("Running RPi.GPIO version '{0}'".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":       # Need at least 0.6 for edge detection
             raise Exception("RPi.GPIO must be greater than 0.6")
         GPIO.setwarnings(False)        # Disable GPIO warnings
+
+
+    @octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
+    def check_status(self):
+        status = "-1"
+        if self.sensor_enabled():
+            status = "0" if self.no_filament() else "1"
+        return jsonify(status=status)
 
     @property
     def pin(self):

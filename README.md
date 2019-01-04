@@ -16,7 +16,7 @@ This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs t
 
 * Configurable GPIO pin.
 * Debounce noisy sensors.
-* Support norbally open and normally closed sensors.
+* Support normally open and normally closed sensors.
 * Execution of custom GCODE when out of filament detected.
 * Optionally pause print when out of filament.
 

@@ -20,6 +20,12 @@ This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs t
 * Execution of custom GCODE when out of filament detected.
 * Optionally pause print when out of filament.
 
+An API is available to check the filament sensor status via a GET method to `/plugin/filamentreload/status` which returns a JSON
+
+- `{status: "-1"}` if the sensor is not setup
+- `{status: "0"}` if the sensor is OFF (filament not present)
+- `{status: "1"}` if the sensor is ON (filament present)
+
 ## Installation
 
 * Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager).

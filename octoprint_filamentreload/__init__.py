@@ -168,7 +168,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self._printer.commands(self.no_filament_gcode)
         else:
             self._logger.debug("Filament detected!")
-            # Set the triggered flag to check next callback
+            # Set the triggered flag to check next callbacks
             self.triggered = 0
 
 

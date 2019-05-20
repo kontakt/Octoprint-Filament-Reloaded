@@ -158,6 +158,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self._printer.commands(self.no_filament_gcode)
         else:
             self._logger.info("Filament detected!")
+            self.triggered = 0
 
 
     def get_update_information(self):

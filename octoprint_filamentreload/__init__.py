@@ -111,7 +111,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def on_event(self, event, payload):
         # Early abort in case of out ot filament when start printing, as we
         # can't change with a cold nozzle
-        self._logger.info("Event received: ", event)
         if event is Events.PRINT_STARTED and self.no_filament() and self.prevent_print:
             self._logger.info("Printing aborted: no filament detected!")
             self._printer.cancel_print()

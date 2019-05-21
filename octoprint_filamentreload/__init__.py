@@ -15,11 +15,11 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.BlueprintPlugin):
 
     def initialize(self):
-        self._logger.info("Running RPi.GPIO version '{0}'".format(GPIO.VERSION))
+        self._logger.info(
+            "Running RPi.GPIO version '{0}'".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":       # Need at least 0.6 for edge detection
             raise Exception("RPi.GPIO must be greater than 0.6")
         GPIO.setwarnings(False)        # Disable GPIO warnings
-
 
     @octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
     def check_status(self):
@@ -53,6 +53,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         return self._settings.get_boolean(["pause_print"])
 
     @property
+    def prevent_print(self):
+        return self._settings.get_boolean(["prevent_print"])
+
+    @property
     def send_gcode_only_once(self):
         return self._settings.get_boolean(["send_gcode_only_once"])
 
@@ -65,10 +69,12 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             else:
                 self._logger.info("Using BCM Mode")
                 GPIO.setmode(GPIO.BCM)
-            self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
+            self._logger.info(
+                "Filament Sensor active on GPIO Pin [%s]" % self.pin)
             GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         else:
-            self._logger.info("Pin not configured, won't work unless configured!")
+            self._logger.info(
+                "Pin not configured, won't work unless configured!")
 
     def on_after_startup(self):
         self._logger.info("Filament Sensor Reloaded started")
@@ -76,13 +82,14 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     def get_settings_defaults(self):
         return dict(
-            pin     = -1,   # Default is no pin
-            bounce  = 250,  # Debounce 250ms
-            switch  = 0,    # Normally Open
-            mode    = 0,    # Board Mode
-            no_filament_gcode = '',
-            pause_print = True,
-            send_gcode_only_once = False, # Default set to False for backward compatibility
+            pin=-1,   # Default is no pin
+            bounce=250,  # Debounce 250ms
+            switch=0,    # Normally Open
+            mode=0,    # Board Mode
+            no_filament_gcode='',
+            pause_print=True,
+            prevent_print=True,
+            send_gcode_only_once=False,  # Default set to False for backward compatibility
         )
 
     def on_settings_save(self, data):
@@ -104,7 +111,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def on_event(self, event, payload):
         # Early abort in case of out ot filament when start printing, as we
         # can't change with a cold nozzle
-        if event is Events.PRINT_STARTED and self.no_filament():
+        if event is Events.PRINT_STARTED and self.no_filament() and self.prevent_print:
             self._logger.info("Printing aborted: no filament detected!")
             self._printer.cancel_print()
         # Enable sensor
@@ -112,9 +119,13 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             Events.PRINT_STARTED,
             Events.PRINT_RESUMED
         ):
+            if self.prevent_print and self.no_filament():
+                self._logger.info(
+                    "Printing paused: request to resume but no filament detected!")
+                self._printer.pause_print()
             self._logger.info("%s: Enabling filament sensor." % (event))
             if self.sensor_enabled():
-                self.triggered = 0 # reset triggered state
+                self.triggered = 0  # reset triggered state
                 GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(
                     self.pin, GPIO.BOTH,
@@ -134,7 +145,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def sensor_callback(self, _):
         sleep(self.bounce/1000)
 
-        # If we have previously triggered a state change we are still out 
+        # If we have previously triggered a state change we are still out
         # of filament. Log it and wait on a print resume or a new print job.
         if self.sensor_triggered():
             self._logger.info("Sensor callback but no trigger state change.")
@@ -158,7 +169,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self._printer.commands(self.no_filament_gcode)
         else:
             self._logger.info("Filament detected!")
-
+            self.triggered = 0
 
     def get_update_information(self):
         return dict(
@@ -177,8 +188,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             )
         )
 
+
 __plugin_name__ = "Filament Sensor Reloaded"
 __plugin_version__ = "1.0.2"
+
 
 def __plugin_load__():
     global __plugin_implementation__
@@ -187,4 +200,4 @@ def __plugin_load__():
     global __plugin_hooks__
     __plugin_hooks__ = {
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
-}
+    }

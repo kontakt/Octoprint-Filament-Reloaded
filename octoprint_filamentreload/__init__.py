@@ -71,12 +71,12 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 GPIO.setmode(GPIO.BCM)
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
 						
-						if self.pullup == 0:
-            		GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-								self._logger.info("Filament Sensor Pin uses pullup)
+            if self.pullup == 0:
+                GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+                self._logger.info("Filament Sensor Pin uses pullup")
             else:
-								GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-								self._logger.info("Filament Sensor Pin uses pulldown)
+                GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+                self._logger.info("Filament Sensor Pin uses pulldown")
         else:
             self._logger.info("Pin not configured, won't work unless configured!")
 

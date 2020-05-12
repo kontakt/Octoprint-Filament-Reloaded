@@ -81,7 +81,7 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
             switch  = 0,    # Normally Open
             mode    = 0,    # Board Mode
             active  = -1,    # Active mode
-			no_filament_gcode = '',
+            no_filament_gcode = '',
             pause_print = True,
             send_gcode_only_once = False, # Default set to False for backward compatibility
         )
@@ -120,12 +120,12 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
             if self.sensor_enabled():
                 self.triggered = 0 # reset triggered state
                 if self.active == -1: #no activation yet
-					GPIO.add_event_detect(
-						self.pin, GPIO.BOTH,
-						callback=self.sensor_callback,
-						bouncetime=self.bounce
-					)
-				self.active = 1
+                    GPIO.add_event_detect(
+                        self.pin, GPIO.BOTH,
+                        callback=self.sensor_callback,
+                        bouncetime=self.bounce
+                    )
+                self.active = 1
         # Disable sensor
         elif event in (
             Events.PRINT_DONE,
@@ -138,9 +138,9 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
 
     def sensor_callback(self, _):
         sleep(self.bounce/1000)
-		if not self.sensor_active():
-			self._logger.debug("Sensor callback but no active sensor.")
-			return
+        if not self.sensor_active():
+            self._logger.debug("Sensor callback but no active sensor.")
+            return
         # If we have previously triggered a state change we are still out 
         # of filament. Log it and wait on a print resume or a new print job.
         if self.sensor_triggered():

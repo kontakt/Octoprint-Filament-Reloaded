@@ -4,7 +4,7 @@
 
 Future developments are planned to include multiple filament sensors and pop-ups.
 
-Initial work based on the [Octoprint-Filament](https://github.com/MoonshineSG/Octoprint-Filament) plugin by MoonshineSG.
+Initial work based on the [Octoprint-Filament](https://github.com/MoonshineSG/Octoprint-Filament) plugin by MoonshineSG and [Octoprint-Reloaded] (https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/master.zip) plugin by kontakt.
 
 ## Required sensor
 
@@ -29,7 +29,7 @@ An API is available to check the filament sensor status via a GET method to `/pl
 ## Installation
 
 * Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager).
-* Manually using this URL: https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/master.zip
+* Manually using this URL: https://github.com/kontakt/Octoprint-Filament-Matrix/archive/master.zip
 
 ## Configuration
 

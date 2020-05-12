@@ -8,13 +8,13 @@ from time import sleep
 from flask import jsonify
 
 
-class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
+class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.EventHandlerPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin,
                              octoprint.plugin.BlueprintPlugin):
-
-    def initialize(self):
+    
+	def initialize(self):
         self._logger.info("Running RPi.GPIO version '{0}'".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":       # Need at least 0.6 for edge detection
             raise Exception("RPi.GPIO must be greater than 0.6")
@@ -80,7 +80,8 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             bounce  = 250,  # Debounce 250ms
             switch  = 0,    # Normally Open
             mode    = 0,    # Board Mode
-            no_filament_gcode = '',
+            active  = -1,    # Active mode
+			no_filament_gcode = '',
             pause_print = True,
             send_gcode_only_once = False, # Default set to False for backward compatibility
         )
@@ -94,6 +95,9 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     def sensor_enabled(self):
         return self.pin != -1
+
+    def sensor_active(self):
+        return self.active
 
     def no_filament(self):
         return GPIO.input(self.pin) != self.switch
@@ -115,12 +119,13 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             self._logger.info("%s: Enabling filament sensor." % (event))
             if self.sensor_enabled():
                 self.triggered = 0 # reset triggered state
-                GPIO.remove_event_detect(self.pin)
-                GPIO.add_event_detect(
-                    self.pin, GPIO.BOTH,
-                    callback=self.sensor_callback,
-                    bouncetime=self.bounce
-                )
+                if self.active == -1: #no activation yet
+					GPIO.add_event_detect(
+						self.pin, GPIO.BOTH,
+						callback=self.sensor_callback,
+						bouncetime=self.bounce
+					)
+				self.active = 1
         # Disable sensor
         elif event in (
             Events.PRINT_DONE,
@@ -129,15 +134,17 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             Events.ERROR
         ):
             self._logger.info("%s: Disabling filament sensor." % (event))
-            GPIO.remove_event_detect(self.pin)
+            self.active = 0
 
     def sensor_callback(self, _):
         sleep(self.bounce/1000)
-
+		if not self.sensor_active():
+			self._logger.debug("Sensor callback but no active sensor.")
+			return
         # If we have previously triggered a state change we are still out 
         # of filament. Log it and wait on a print resume or a new print job.
         if self.sensor_triggered():
-            self._logger.info("Sensor callback but no trigger state change.")
+            self._logger.debug("Sensor callback but no trigger state change.")
             return
 
         # Set the triggered flag to check next callback
@@ -157,32 +164,32 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self._logger.info("Sending out of filament GCODE")
                 self._printer.commands(self.no_filament_gcode)
         else:
-            self._logger.info("Filament detected!")
+            self._logger.debug("Filament detected!")
 
 
     def get_update_information(self):
         return dict(
             octoprint_filament=dict(
-                displayName="Filament Sensor Reloaded",
+                displayName="Filament Sensor Matrix",
                 displayVersion=self._plugin_version,
 
                 # version check: github repository
                 type="github_release",
-                user="kontakt",
-                repo="Octoprint-Filament-Reloaded",
+                user="mrseeker",
+                repo="Octoprint-Filament-Matrix",
                 current=self._plugin_version,
 
                 # update method: pip
-                pip="https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
+                pip="https://github.com/kontakt/Octoprint-Filament-Matrix/archive/{target_version}.zip"
             )
         )
 
-__plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.0.2"
+__plugin_name__ = "Filament Sensor Matrix"
+__plugin_version__ = "1.0.3"
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = FilamentReloadedPlugin()
+    __plugin_implementation__ = FilamentMatrixPlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {

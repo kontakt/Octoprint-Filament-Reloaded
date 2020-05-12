@@ -80,7 +80,6 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
             bounce  = 250,  # Debounce 250ms
             switch  = 0,    # Normally Open
             mode    = 0,    # Board Mode
-            active  = -1,    # Active mode
             no_filament_gcode = '',
             pause_print = True,
             send_gcode_only_once = False, # Default set to False for backward compatibility
@@ -119,7 +118,8 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
             self._logger.info("%s: Enabling filament sensor." % (event))
             if self.sensor_enabled():
                 self.triggered = 0 # reset triggered state
-                if self.active == -1: #no activation yet
+                if not hasattr(self, 'active'): #no activation yet
+                    self.active = 1
                     GPIO.add_event_detect(
                         self.pin, GPIO.BOTH,
                         callback=self.sensor_callback,
@@ -143,15 +143,19 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
             return
         # If we have previously triggered a state change we are still out 
         # of filament. Log it and wait on a print resume or a new print job.
-        if self.sensor_triggered():
-            self._logger.debug("Sensor callback but no trigger state change.")
-            return
-
-        # Set the triggered flag to check next callback
-        self.triggered = 1
+        #if self.sensor_triggered():
+            #Make sure that we still out of filament
+        #    self.triggered = self.no_filament
+        #    self._logger.info("Sensor callback but no trigger state change.")
+        #    return
 
         if self.no_filament():
+            if self.triggered == 1:
+                self._logger.info("Waiting for filament...")
+                return
             self._logger.info("Out of filament!")
+            # Set the triggered flag to check next callback
+            self.triggered = 1
             if self.send_gcode_only_once:
                 self._logger.info("Sending GCODE only once...")
             else:
@@ -165,6 +169,8 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
                 self._printer.commands(self.no_filament_gcode)
         else:
             self._logger.debug("Filament detected!")
+            # Set the triggered flag to check next callback
+            self.triggered = 0
 
 
     def get_update_information(self):

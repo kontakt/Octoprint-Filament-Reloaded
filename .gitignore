@@ -7,4 +7,3 @@ dist
 *.egg*
 .DS_Store
 *.zip
-make.sh

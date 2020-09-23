@@ -8,12 +8,12 @@ from time import sleep
 from flask import jsonify
 
 
-class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
+class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.EventHandlerPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin,
                              octoprint.plugin.BlueprintPlugin):
-    
+
 	def initialize(self):
         self._logger.info("Running RPi.GPIO version '{0}'".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":       # Need at least 0.6 for edge detection
@@ -141,7 +141,7 @@ class FilamentMatrixPlugin(octoprint.plugin.StartupPlugin,
         if not self.sensor_active():
             self._logger.debug("Sensor callback but no active sensor.")
             return
-        # If we have previously triggered a state change we are still out 
+        # If we have previously triggered a state change we are still out
         # of filament. Log it and wait on a print resume or a new print job.
         #if self.sensor_triggered():
             #Make sure that we still out of filament
@@ -195,7 +195,7 @@ __plugin_version__ = "1.0.3"
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = FilamentMatrixPlugin()
+    __plugin_implementation__ = FilamentReloadedPlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {

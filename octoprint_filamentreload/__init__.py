@@ -186,7 +186,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
                 # update method: pip
                 pip="https://github.com/ssorgatem/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
-            )
+            ))
 
 __plugin_name__ = "Filament Sensor Reloaded"
 __plugin_version__ = "1.1.1"

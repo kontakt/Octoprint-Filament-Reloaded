@@ -1,6 +1,5 @@
 # coding=utf-8
 from __future__ import absolute_import
-
 import octoprint.plugin
 from octoprint.events import Events
 import RPi.GPIO as GPIO
@@ -232,6 +231,7 @@ def get_update_information(self):
 
 __plugin_name__ = "Filament Sensor Reloaded"
 __plugin_version__ = "1.1.1"
+__plugin_pythoncompat__ = ">=2.7,<4"
 
 
 def __plugin_load__():

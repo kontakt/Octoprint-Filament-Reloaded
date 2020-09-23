@@ -1,4 +1,4 @@
-# OctoPrint-FilamentMatrix
+# OctoPrint-FilamentReloaded
 
 [OctoPrint](http://octoprint.org/) plugin that integrates with a filament sensor hooked up to a Raspberry Pi GPIO pin and allows the filament spool to be changed during a print if the filament runs out.
 
@@ -20,7 +20,7 @@ This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs t
 * Execution of custom GCODE when out of filament detected.
 * Optionally pause print when out of filament.
 
-An API is available to check the filament sensor status via a GET method to `/plugin/filamentmatrix/status` which returns a JSON
+An API is available to check the filament sensor status via a GET method to `/plugin/filamentreload/status` which returns a JSON
 
 - `{status: "-1"}` if the sensor is not setup
 - `{status: "0"}` if the sensor is OFF (filament not present)

@@ -224,7 +224,7 @@ def get_update_information(self):
 			current=self._plugin_version,
 
 			# update method: pip
-			pip="https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
+			pip="https://github.com/ssorgatem/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
 		)
 	)
 

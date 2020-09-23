@@ -211,22 +211,22 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 			self.triggered = 0
 
 
-	def get_update_information(self):
-		return dict(
-			octoprint_filament=dict(
-				displayName="Filament Sensor Reloaded",
-				displayVersion=self._plugin_version,
+def get_update_information(self):
+	return dict(
+		octoprint_filament=dict(
+			displayName="Filament Sensor Reloaded",
+			displayVersion=self._plugin_version,
 
-				# version check: github repository
-				type="github_release",
-				user="ssorgatem",
-				repo="Octoprint-Filament-Reloaded",
-				current=self._plugin_version,
+			# version check: github repository
+			type="github_release",
+			user="ssorgatem",
+			repo="Octoprint-Filament-Reloaded",
+			current=self._plugin_version,
 
-				# update method: pip
-				pip="https://github.com/ssorgatem/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
-			)
+			# update method: pip
+			pip="https://github.com/ssorgatem/Octoprint-Filament-Reloaded/archive/{target_version}.zip"
 		)
+	)
 
 
 __plugin_name__ = "Filament Sensor Reloaded"

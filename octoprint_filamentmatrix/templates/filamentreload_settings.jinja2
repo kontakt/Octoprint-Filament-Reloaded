@@ -43,7 +43,13 @@
                 <input type="checkbox" data-bind="checked: settings.plugins.filamentreload.pause_print"> {{ _('Pause print when out of filament') }}
             </label>
         </div>
+        <div class="controls" data-toggle="tooltip" title="{{ _('With this option checked, the plugin will not allow the print to start or resume if it does not detect that filament is present.') }}">
+            <label class="checkbox">
+                <input type="checkbox" data-bind="checked: settings.plugins.filamentreload.prevent_print"> {{ _('Prevent start/resume when out of filament') }}
+            </label>
+        </div>
     </div>
+    
     <div class="control-group">
         <div class="controls" data-toggle="tooltip" title="{{ _('With this option checked, the plugin will ignore subsequent reports of out of filament until the print is resumed again.') }}">
             <label class="checkbox">

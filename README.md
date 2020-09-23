@@ -29,7 +29,7 @@ An API is available to check the filament sensor status via a GET method to `/pl
 ## Installation
 
 * Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager).
-* Manually using this URL: https://github.com/mrseeker/Octoprint-Filament-Matrix/archive/master.zip
+* Manually using this URL: https://github.com/kontakt/Octoprint-Filament-Matrix/archive/master.zip
 
 ## Configuration
 

@@ -5,13 +5,54 @@ from octoprint.events import Events
 import RPi.GPIO as GPIO
 from time import sleep
 from flask import jsonify
+from threading import Thread
 
 
 class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.EventHandlerPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin,
-                             octoprint.plugin.BlueprintPlugin):
+                             octoprint.plugin.BlueprintPlugin,
+                             octoprint.plugin.AssetPlugin):
+
+    class filamentStatusWatcher(Thread):
+
+        running = False
+
+        def __init__(self):
+            Thread.__init__(self)
+
+        def populate(self, wPluginManager, wIdentifier, wCurrentState,wCheckRate, wLogger):
+            self._logger=wLogger
+            self.wPluginManager = wPluginManager
+            self.wIdentifier = wIdentifier
+            self.wCurrentState = wCurrentState
+            self.wCheckRate = wCheckRate
+
+        def run(self):
+            self.running= True
+            while self.running==True:
+                self.updateIcon()
+                sleep(self.wCheckRate/1000)
+
+        def stopWatch(self):
+            if self.running==True:
+                self.running=False
+
+        def updateIcon(self):
+            if self.wCurrentState==0:
+                self._logger.debug("Thread: Update icon 0")
+                self.wPluginManager.send_plugin_message(self.wIdentifier, dict(filamentStatus="empty"))
+            elif self.wCurrentState==1:
+                self._logger.debug("Thread: Update icon 1")
+                self.wPluginManager.send_plugin_message(self.wIdentifier, dict(filamentStatus="present"))
+            elif self.wCurrentState==2:
+                self._logger.debug("Thread: Update icon 2")
+                self.wPluginManager.send_plugin_message(self.wIdentifier, dict(filamentStatus="unknown"))
+
+    state=2 #0 no filamenet , 1 filament present, 2 init
+    last_state=2
+    filamentStatusWatcher = filamentStatusWatcher()
 
     def initialize(self):
         self._logger.info(
@@ -34,6 +75,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     @property
     def bounce(self):
         return int(self._settings.get(["bounce"]))
+
+    @property
+    def checkrate(self):
+        return int(self._settings.get(["checkrate"]))
 
     @property
     def switch(self):
@@ -81,6 +126,26 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             else:
                 GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
                 self._logger.info("Filament Sensor Pin uses pulldown")
+
+            if self.filamentStatusWatcher.running == False:
+                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.state,self.checkrate,self._logger)
+                self.filamentStatusWatcher.daemon = True
+                self.filamentStatusWatcher.start()
+
+                if self.no_filament():
+                    pass
+            else:
+                self._logger.info("Setting new checkrate")
+                self.filamentStatusWatcher.wCheckRate = self.checkrate
+                if self.no_filament():
+                    pass
+
+            GPIO.remove_event_detect(self.pin)
+            GPIO.add_event_detect(
+                self.pin, GPIO.BOTH,
+                callback=self.sensor_callback,
+                bouncetime=self.bounce
+            )
         else:
             self._logger.info(
                 "Pin not configured, won't work unless configured!")
@@ -99,6 +164,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             pause_print=True,
             prevent_print=True,
             send_gcode_only_once=False,  # Default set to False for backward compatibility
+            checkrate = 1500, #navbar icon check frequency
         )
 
     def on_settings_save(self, data):
@@ -115,17 +181,32 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         return self.active
 
     def no_filament(self):
-        return GPIO.input(self.pin) != self.switch
+        nofilament = GPIO.input(self.pin) != self.switch
+        if nofilament:
+            self.filamentStatusWatcher.wCurrentState=0
+        else:
+            self.filamentStatusWatcher.wCurrentState=1
+        return nofilament
+
+    ##~~ AssetPlugin mixin
+    def get_assets(self):
+        return dict(js=["js/filamentreload.js"],css=["css/filamentreload.css"])
+
 
     def get_template_configs(self):
-        return [dict(type="settings", custom_bindings=False)]
+        return [
+            dict(type="navbar", custom_bindings=False),
+            dict(type="settings", custom_bindings=False)
+        ]
 
     def on_event(self, event, payload):
         # Early abort in case of out ot filament when start printing, as we
         # can't change with a cold nozzle
         if event is Events.PRINT_STARTED and self.no_filament() and self.prevent_print:
+            state=0
             self._logger.info("Printing aborted: no filament detected!")
             self._printer.cancel_print()
+
         # Enable sensor
         if event in (
             Events.PRINT_STARTED,
@@ -140,6 +221,15 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self.triggered = 0 # reset triggered state
                 if not hasattr(self, 'active'): #no activation yet
                     self.active = 1
+            if self.no_filament():
+                self.state=0
+                pass
+            else:
+                self.state=1
+                self._logger.info("%s: Enabling filament sensor." % (event))
+                if self.sensor_enabled():
+                    GPIO.remove_event_detect(self.pin)
+                    self._logger.info("Filament present, print starting")
                     GPIO.add_event_detect(
                         self.pin, GPIO.BOTH,
                         callback=self.sensor_callback,
@@ -151,12 +241,18 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             Events.PRINT_DONE,
             Events.PRINT_FAILED,
             Events.PRINT_CANCELLED,
+            Events.PRINT_PAUSED,
             Events.ERROR
         ):
             self._logger.info("%s: Disabling filament sensor." % (event))
             self.active = 0
+            #GPIO.remove_event_detect(self.pin)
 
     def sensor_callback(self, _):
+
+        self._logger.debug("Last State Start Sensor: %d" %self.last_state)
+        self._logger.debug("State Start Sensor: %d" %self.state)
+
         sleep(self.bounce/1000)
         if not self.sensor_active():
             self._logger.debug("Sensor callback but no active sensor.")
@@ -173,24 +269,39 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             if self.triggered == 1:
                 self._logger.info("Waiting for filament...")
                 return
-            self._logger.info("Out of filament!")
             # Set the triggered flag to check next callback
             self.triggered = 1
-            if self.send_gcode_only_once:
-                self._logger.info("Sending GCODE only once...")
-            else:
-                # Need to resend GCODE (old default) so reset trigger
-                self.triggered = 0
-            if self.pause_print:
-                self._logger.info("Pausing print.")
-                self._printer.pause_print()
-            if self.no_filament_gcode:
-                self._logger.info("Sending out of filament GCODE")
-                self._printer.commands(self.no_filament_gcode)
+			self.state = 0
+			if self.state != self.last_state:
+				self._logger.info("Out of filament!")
+				self.last_state = 0
+				if self.send_gcode_only_once:
+					self._logger.info("Sending GCODE only once...")
+				else:
+					# Need to resend GCODE (old default) so reset trigger
+					self.triggered = 0
+				if self.pause_print:
+					self._logger.info("Pausing print.")
+					self._printer.pause_print()
+				# GPIO.remove_event_detect(self.pin)
+				if self.no_filament_gcode:
+					self._logger.info("Sending out of filament GCODE")
+					self._printer.commands(self.no_filament_gcode)
+					# GPIO.remove_event_detect(self.pin)
         else:
             self._logger.debug("Filament detected!")
             # Set the triggered flag to check next callbacks
             self.triggered = 0
+            self.state = 1
+            self._logger.debug("Last State Before if: %d" %self.last_state)
+            self._logger.debug("State Before if: %d" %self.state)
+
+            if self.state != self.last_state:
+                self._logger.info("Filament present")
+                self.last_state = 1
+
+        self._logger.debug("Last State EndCB: %d" %self.last_state)
+        self._logger.debug("State EndCB: %d" %self.state)
 
     def get_update_information(self):
         return dict(

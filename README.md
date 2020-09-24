@@ -6,6 +6,11 @@ Future developments are planned to include multiple filament sensors and pop-ups
 
 Initial work based on the [Octoprint-Filament](https://github.com/MoonshineSG/Octoprint-Filament) plugin by MoonshineSG and [Octoprint-Reloaded] (https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/master.zip) plugin by kontakt.
 
+## Fork by Floyz:
+
+* Avoid multiple pause sent to printer when filament run out and minimize logs when GPIO events gets fired multiple times.
+* Added Icon in the nav bar to reflect filament detection status. (with check frequency in parameters)
+
 ## Required sensor
 
 Using this plugin requires a filament sensor. The code is set to use the Raspberry Pi's internal Pull-Up resistors, so the switch should be between your detection pin and a ground pin.

@@ -300,9 +300,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self._logger.info("Filament present")
                 self.last_state = 1
 
-        self._logger.debug("Last State EndCB: %d" %self.last_state)
-        self._logger.debug("State EndCB: %d" %self.state)
-
     def get_update_information(self):
         return dict(
             octoprint_filament=dict(

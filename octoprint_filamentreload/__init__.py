@@ -22,12 +22,12 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
         def __init__(self):
             Thread.__init__(self)
+            self.wCurrentState = -1
 
-        def populate(self, wPluginManager, wIdentifier, wCurrentState,wCheckRate, wLogger):
+        def populate(self, wPluginManager, wIdentifier ,wCheckRate, wLogger):
             self._logger=wLogger
             self.wPluginManager = wPluginManager
             self.wIdentifier = wIdentifier
-            self.wCurrentState = wCurrentState
             self.wCheckRate = wCheckRate
 
         def run(self):
@@ -47,11 +47,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             elif self.wCurrentState==1:
                 self._logger.debug("Thread: Update icon 1")
                 self.wPluginManager.send_plugin_message(self.wIdentifier, dict(filamentStatus="present"))
-            elif self.wCurrentState==2:
+            elif self.wCurrentState==-1:
                 self._logger.debug("Thread: Update icon 2")
                 self.wPluginManager.send_plugin_message(self.wIdentifier, dict(filamentStatus="unknown"))
 
-    state=2 #0 no filamenet , 1 filament present, 2 init
     filamentStatusWatcher = filamentStatusWatcher()
 
     def initialize(self):
@@ -128,17 +127,13 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self._logger.info("Filament Sensor Pin uses pulldown")
 
             if self.filamentStatusWatcher.running == False:
-                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.state,self.checkrate,self._logger)
+                self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.checkrate,self._logger)
                 self.filamentStatusWatcher.daemon = True
                 self.filamentStatusWatcher.start()
-
-                if self.no_filament():
-                    pass
             else:
                 self._logger.info("Setting new checkrate")
                 self.filamentStatusWatcher.wCheckRate = self.checkrate
-                if self.no_filament():
-                    pass
+            self.no_filament()#to update the watcher's status
 
             GPIO.remove_event_detect(self.pin)
             GPIO.add_event_detect(
@@ -182,10 +177,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     def no_filament(self):
         nofilament = GPIO.input(self.pin) != self.switch
-        if nofilament:
-            self.filamentStatusWatcher.wCurrentState=0
-        else:
-            self.filamentStatusWatcher.wCurrentState=1
+        self.filamentStatusWatcher.wCurrentState= int(not(nofilament))
         return nofilament
 
     ##~~ AssetPlugin mixin
@@ -221,11 +213,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self.triggered = 0 # reset triggered state
                 if not hasattr(self, 'active'): #no activation yet
                     self.active = 1
-            if self.no_filament():
-                self.state=0
-                pass
             else:
-                self.state=1
                 self._logger.info("%s: Enabling filament sensor." % (event))
                 if self.sensor_enabled():
                     GPIO.remove_event_detect(self.pin)
@@ -249,8 +237,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     def sensor_callback(self, _):
 
-        self._logger.debug("State Start Sensor: %d" %self.state)
-
         sleep(self.bounce/1000)
         if not self.sensor_active():
             self._logger.debug("Sensor callback but no active sensor.")
@@ -269,7 +255,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 return
             # Set the triggered flag to check next callback
             self.triggered = 1
-            self.state = 0
             self._logger.info("Out of filament!")
             if self.send_gcode_only_once:
                 self._logger.info("Sending GCODE only once...")
@@ -286,8 +271,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             self._logger.debug("Filament detected!")
             # Set the triggered flag to check next callbacks
             self.triggered = 0
-            self.state = 1
-            self._logger.debug("State Before if: %d" %self.state)
 
     def get_update_information(self):
         return dict(

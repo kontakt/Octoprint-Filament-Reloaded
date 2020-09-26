@@ -14,6 +14,13 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label">{{ _('NavBar Icon Check Frequency:') }}</label>
+        <div class="controls" data-toggle="tooltip" title="{{ _('Very high check rate may impact performance, recommanded: 1~2sec') }}">
+            <input type="number" step="any" min="100" class="input-mini text-right" data-bind="value: settings.plugins.filamentreload.checkrate">
+            <span class="add-on">ms</span>
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">{{ _('Switch Type:') }}</label>
         <div class="controls" data-toggle="tooltip" title="{{ _('Whether the sensor should trip when the switch goes HIGH or LOW, Normally Open is LOW when filament is present, and Normally Closed is HIGH when filament is present.') }}">
             <select class="select-mini" data-bind="value: settings.plugins.filamentreload.switch">

@@ -19,6 +19,7 @@ This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs t
 * Support normally open and normally closed sensors.
 * Execution of custom GCODE when out of filament detected.
 * Optionally pause print when out of filament.
+* Icon in the nav bar to reflect filament detection status. (with check frequency in parameters)
 
 An API is available to check the filament sensor status via a GET method to `/plugin/filamentreload/status` which returns a JSON
 

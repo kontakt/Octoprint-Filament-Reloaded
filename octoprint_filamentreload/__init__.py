@@ -246,7 +246,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         ):
             self._logger.info("%s: Disabling filament sensor." % (event))
             self.active = 0
-            #GPIO.remove_event_detect(self.pin)
 
     def sensor_callback(self, _):
 
@@ -282,11 +281,9 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             if self.pause_print:
                 self._logger.info("Pausing print.")
                 self._printer.pause_print()
-            # GPIO.remove_event_detect(self.pin)
             if self.no_filament_gcode:
                 self._logger.info("Sending out of filament GCODE")
                 self._printer.commands(self.no_filament_gcode)
-                # GPIO.remove_event_detect(self.pin)
         else:
             self._logger.debug("Filament detected!")
             # Set the triggered flag to check next callbacks

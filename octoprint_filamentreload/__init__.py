@@ -88,6 +88,10 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         return int(self._settings.get(["mode"]))
 
     @property
+    def pullup(self):
+        return int(self._settings.get(["pullup"]))
+
+    @property
     def no_filament_gcode(self):
         return str(self._settings.get(["no_filament_gcode"])).splitlines()
 
@@ -112,9 +116,15 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             else:
                 self._logger.info("Using BCM Mode")
                 GPIO.setmode(GPIO.BCM)
-            self._logger.info(
-                "Filament Sensor active on GPIO Pin [%s]" % self.pin)
-            GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+            self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
+
+            if self.pullup == 0:
+                GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+                self._logger.info("Filament Sensor Pin uses pullup")
+            else:
+                GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+                self._logger.info("Filament Sensor Pin uses pulldown")
 
             if self.filamentStatusWatcher.running == False:
                 self.filamentStatusWatcher.populate(self._plugin_manager, self._identifier, self.checkrate,self._logger)

@@ -52,7 +52,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 self.wPluginManager.send_plugin_message(self.wIdentifier, dict(filamentStatus="unknown"))
 
     state=2 #0 no filamenet , 1 filament present, 2 init
-    last_state=2
     filamentStatusWatcher = filamentStatusWatcher()
 
     def initialize(self):
@@ -250,7 +249,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     def sensor_callback(self, _):
 
-        self._logger.debug("Last State Start Sensor: %d" %self.last_state)
         self._logger.debug("State Start Sensor: %d" %self.state)
 
         sleep(self.bounce/1000)
@@ -273,7 +271,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             self.triggered = 1
             self.state = 0
             self._logger.info("Out of filament!")
-            self.last_state = 0
             if self.send_gcode_only_once:
                 self._logger.info("Sending GCODE only once...")
             else:
@@ -290,12 +287,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             # Set the triggered flag to check next callbacks
             self.triggered = 0
             self.state = 1
-            self._logger.debug("Last State Before if: %d" %self.last_state)
             self._logger.debug("State Before if: %d" %self.state)
-
-            if self.state != self.last_state:
-                self._logger.info("Filament present")
-                self.last_state = 1
 
     def get_update_information(self):
         return dict(

@@ -89,7 +89,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     @property
     def pullup(self):
-        return 0#Let's try to debug this
         return int(self._settings.get(["pullup"] or 0))
 
     @property

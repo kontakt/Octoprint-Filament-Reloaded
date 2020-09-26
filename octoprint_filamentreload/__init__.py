@@ -271,22 +271,22 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                 return
             # Set the triggered flag to check next callback
             self.triggered = 1
-			self.state = 0
-			self._logger.info("Out of filament!")
-			self.last_state = 0
-			if self.send_gcode_only_once:
-				self._logger.info("Sending GCODE only once...")
-			else:
-				# Need to resend GCODE (old default) so reset trigger
-				self.triggered = 0
-			if self.pause_print:
-				self._logger.info("Pausing print.")
-				self._printer.pause_print()
-			# GPIO.remove_event_detect(self.pin)
-			if self.no_filament_gcode:
-				self._logger.info("Sending out of filament GCODE")
-				self._printer.commands(self.no_filament_gcode)
-				# GPIO.remove_event_detect(self.pin)
+            self.state = 0
+            self._logger.info("Out of filament!")
+            self.last_state = 0
+            if self.send_gcode_only_once:
+                self._logger.info("Sending GCODE only once...")
+            else:
+                # Need to resend GCODE (old default) so reset trigger
+                self.triggered = 0
+            if self.pause_print:
+                self._logger.info("Pausing print.")
+                self._printer.pause_print()
+            # GPIO.remove_event_detect(self.pin)
+            if self.no_filament_gcode:
+                self._logger.info("Sending out of filament GCODE")
+                self._printer.commands(self.no_filament_gcode)
+                # GPIO.remove_event_detect(self.pin)
         else:
             self._logger.debug("Filament detected!")
             # Set the triggered flag to check next callbacks

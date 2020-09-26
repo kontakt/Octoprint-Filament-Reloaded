@@ -12,8 +12,9 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.EventHandlerPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin,
-                             octoprint.plugin.BlueprintPlugin,
-                             octoprint.plugin.AssetPlugin):
+                             octoprint.plugin.AssetPlugin,
+                             octoprint.plugin.BlueprintPlugin
+                             ):
 
     class filamentStatusWatcher(Thread):
 

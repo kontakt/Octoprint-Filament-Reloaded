@@ -14,7 +14,7 @@ This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs t
 
 ## Features
 
-* Configurable GPIO pin.
+* Configurable GPIO pin (including the type of resistor on the pin)
 * Debounce noisy sensors.
 * Support normally open and normally closed sensors.
 * Execution of custom GCODE when out of filament detected.

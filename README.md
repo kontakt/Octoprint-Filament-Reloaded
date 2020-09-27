@@ -4,7 +4,7 @@
 
 Future developments are planned to include multiple filament sensors and pop-ups.
 
-Initial work based on the [Octoprint-Filament](https://github.com/MoonshineSG/Octoprint-Filament) plugin by MoonshineSG.
+Initial work based on the [Octoprint-Filament](https://github.com/MoonshineSG/Octoprint-Filament) plugin by MoonshineSG and [Octoprint-Reloaded] (https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/master.zip) plugin by kontakt.
 
 ## Required sensor
 
@@ -14,11 +14,12 @@ This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs t
 
 ## Features
 
-* Configurable GPIO pin.
+* Configurable GPIO pin (including the type of resistor on the pin)
 * Debounce noisy sensors.
 * Support normally open and normally closed sensors.
 * Execution of custom GCODE when out of filament detected.
 * Optionally pause print when out of filament.
+* Icon in the nav bar to reflect filament detection status. (with check frequency in parameters)
 
 An API is available to check the filament sensor status via a GET method to `/plugin/filamentreload/status` which returns a JSON
 
@@ -29,7 +30,7 @@ An API is available to check the filament sensor status via a GET method to `/pl
 ## Installation
 
 * Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager).
-* Manually using this URL: https://github.com/kontakt/Octoprint-Filament-Reloaded/archive/master.zip
+* Manually using this URL: https://github.com/ssorgatem/Octoprint-Filament-Reloaded/archive/master.zip
 
 ## Configuration
 

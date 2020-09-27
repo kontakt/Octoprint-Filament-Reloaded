@@ -19,6 +19,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         if GPIO.VERSION < "0.6":       # Need at least 0.6 for edge detection
             raise Exception("RPi.GPIO must be greater than 0.6")
         GPIO.setwarnings(False)        # Disable GPIO warnings
+        self.pin_value = -1			   # Cache the pin value when we detect out of filament
 
 
     @octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
@@ -134,14 +135,27 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def sensor_callback(self, _):
         sleep(self.bounce/1000)
 
-        # If we have previously triggered a state change we are still out 
+        pin_triggered = GPIO.input(self.pin)
+
+        self._logger.info("The value of the pin is {}. No filament = {} input = {}".format(pin_triggered, self.no_filament(), _))
+
+        # If we have previously triggered a state change we are still out
         # of filament. Log it and wait on a print resume or a new print job.
         if self.sensor_triggered():
-            self._logger.info("Sensor callback but no trigger state change.")
-            return
+            self._logger.info("Sensor callback with triggered set")
+			#
+			# Check to see if this is a spurious call back by the GPIO change system.  We have cached the
+			# value of the sensor in self.pin_value.  If they are the same then we simply return
+            if self.pin_value == pin_triggered:
+                self._logger.info("Looks like we had one spurious callback , nothing to do, return")
+                return
+            else:
+                self._logger.info("The pin is different lets process it.")
+
 
         # Set the triggered flag to check next callback
         self.triggered = 1
+        self.pin_value = pin_triggered
 
         if self.no_filament():
             self._logger.info("Out of filament!")

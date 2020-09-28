@@ -302,7 +302,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
 
 __plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.3.0"
+__plugin_version__ = "1.3.1"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 

@@ -256,9 +256,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             else:
                 self._logger.info("The pin is different lets process it.")
 
-
-        # Set the triggered flag to check next callback
-        self.triggered = 1
         self.pin_value = pin_triggered
 
         if self.no_filament():

@@ -23,6 +23,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         def __init__(self):
             Thread.__init__(self)
             self.wCurrentState = -1
+            self.active = 0
 
         def populate(self, wPluginManager, wIdentifier ,wCheckRate, wLogger):
             self._logger=wLogger
@@ -173,9 +174,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
     def sensor_enabled(self):
         return self.pin != -1
 
-    def sensor_active(self):
-        return self.active
-
     def no_filament(self):
         nofilament = GPIO.input(self.pin) != self.switch
         self.filamentStatusWatcher.wCurrentState= int(not(nofilament))
@@ -211,25 +209,20 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             self._logger.info("%s: Enabling filament sensor." % (event))
             if self.sensor_enabled():
                 self.triggered = 0 # reset triggered state
-                if not hasattr(self, 'active'): #no activation yet
-                    self.active = 1
-            else:
-                self._logger.info("%s: Enabling filament sensor." % (event))
-                if self.sensor_enabled():
-                    GPIO.remove_event_detect(self.pin)
-                    self._logger.info("Filament present, print starting")
-                    GPIO.add_event_detect(
+                self.active = 1
+                GPIO.remove_event_detect(self.pin)
+                self._logger.info("Filament present, print starting")
+                GPIO.add_event_detect(
                         self.pin, GPIO.BOTH,
                         callback=self.sensor_callback,
                         bouncetime=self.bounce
                     )
-                self.active = 1
         # Disable sensor
         elif event in (
             Events.PRINT_DONE,
             Events.PRINT_FAILED,
             Events.PRINT_CANCELLED,
-#            Events.PRINT_PAUSED,
+            Events.PRINT_PAUSED,
             Events.ERROR
         ):
             self._logger.info("%s: Disabling filament sensor." % (event))
@@ -240,7 +233,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         pin_triggered = GPIO.input(self.pin)
 
         self._logger.info("The value of the pin is {}. No filament = {} input = {}".format(pin_triggered, self.no_filament(), _))
-        if not self.sensor_active():
+        if not self.active:
             self._logger.debug("Sensor callback but no active sensor.")
             return
         # If we have previously triggered a state change we are still out

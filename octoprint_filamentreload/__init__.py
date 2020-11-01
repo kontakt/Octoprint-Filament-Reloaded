@@ -116,8 +116,9 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
             if self.sensor_enabled():
                 self.triggered = 0 # reset triggered state
                 GPIO.remove_event_detect(self.pin)
+                GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
                 GPIO.add_event_detect(
-                    self.pin, GPIO.BOTH,
+                    self.pin, GPIO.RISING,
                     callback=self.sensor_callback,
                     bouncetime=self.bounce
                 )

@@ -15,7 +15,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.AssetPlugin,
                              octoprint.plugin.BlueprintPlugin
                              ):
-
+    active = 0
     class filamentStatusWatcher(Thread):
 
         running = False
@@ -23,7 +23,6 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
         def __init__(self):
             Thread.__init__(self)
             self.wCurrentState = -1
-            self.active = 0
 
         def populate(self, wPluginManager, wIdentifier ,wCheckRate, wLogger):
             self._logger=wLogger
@@ -292,7 +291,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
 
 __plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.3.3"
+__plugin_version__ = "1.3.4"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 

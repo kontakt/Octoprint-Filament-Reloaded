@@ -180,7 +180,12 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     ##~~ AssetPlugin mixin
     def get_assets(self):
-        return dict(js=["js/filamentreload.js"],css=["css/filamentreload.css"])
+				return {
+					  "js": ["js/filamentreload.js"],
+            "less": ["less/filamentreload.less"],
+            "css": ["css/filamentreload.css"]
+				}
+        # return dict(js=["js/filamentreload.js"],css=["css/filamentreload.css"],less=["less/psucontrol.less"],)
 
 
     def get_template_configs(self):
@@ -291,7 +296,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
 
 __plugin_name__ = "Filament Sensor Reloaded"
-__plugin_version__ = "1.3.4"
+__plugin_version__ = "1.4.0"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 

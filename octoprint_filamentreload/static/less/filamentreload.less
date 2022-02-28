@@ -1,0 +1,15 @@
+@filament_indicator_present: #00FF00;
+@filament_indicator_empty: #FF8C00;
+@filament_indicator_unknown: grey;
+
+#filament_indicator {
+    &.present {
+        color: @filament_indicator_present;
+    }
+    &.empty {
+        color: @filament_indicator_empty;
+    }
+    &.unknown {
+        color: @filament_indicator_unknown;
+    }
+}

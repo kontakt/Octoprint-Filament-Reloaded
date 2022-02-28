@@ -12,6 +12,8 @@ Using this plugin requires a filament sensor. The code is set to use the Raspber
 
 This plugin is using the GPIO.BOARD numbering scheme, the pin being used needs to be selected by the physical pin number.
 
+_A DIY guide is in planned for new sensor users_
+
 ## Features
 
 * Configurable GPIO pin (including the type of resistor on the pin)
@@ -30,7 +32,7 @@ An API is available to check the filament sensor status via a GET method to `/pl
 ## Installation
 
 * Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager).
-* Manually using this URL: https://github.com/ssorgatem/Octoprint-Filament-Reloaded/archive/master.zip
+* Manually using this URL: https://github.com/nickmitchko/Octoprint-Filament-Reloaded/archive/master.zip
 
 ## Configuration
 

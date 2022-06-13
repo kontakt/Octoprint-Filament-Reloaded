@@ -90,7 +90,7 @@ class FilamentReloadedPlugin(octoprint.plugin.StartupPlugin,
 
     @property
     def pullup(self):
-        return int(self._settings.get(["pullup"] or 0))
+        return int(self._settings.get(["pullup"]))
 
     @property
     def no_filament_gcode(self):

@@ -2,7 +2,7 @@
 
 ## Issue Tracking
 
-I hae a day job, so when filing an issue please tag me @nickmitchko in the issue so I get an email.
+I have a day job, so when filing an issue please tag me @nickmitchko in the issue so I get an email.
 
 ## Overview
 

@@ -1,5 +1,11 @@
 # OctoPrint-FilamentReloaded
 
+## Issue Tracking
+
+I hae a day job, so when filing an issue please tag me @nickmitchko in the issue so I get an email.
+
+## Overview
+
 [OctoPrint](http://octoprint.org/) plugin that integrates with a filament sensor hooked up to a Raspberry Pi GPIO pin and allows the filament spool to be changed during a print if the filament runs out.
 
 Future developments are planned to include multiple filament sensors and pop-ups.

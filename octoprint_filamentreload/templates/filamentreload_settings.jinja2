@@ -48,7 +48,7 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">{{ _('Out of filament GCODE:') }}</label>
+        <label class="control-label">{{ _('Custom Pause GCODE:') }}</label>
         <div class="controls">
             <textarea rows="4" class="block" data-bind="value: settings.plugins.filamentreload.no_filament_gcode"></textarea>
         </div>
@@ -56,7 +56,7 @@
     <div class="control-group">
         <div class="controls" data-toggle="tooltip" title="{{ _('Beware that for some printers, pausing is incompatible with M600 (Filament change pause) as both will move the print head and it can resume at a different position as it paused.') }}">
             <label class="checkbox">
-                <input type="checkbox" data-bind="checked: settings.plugins.filamentreload.pause_print"> {{ _('Pause print when out of filament') }}
+                <input type="checkbox" data-bind="checked: settings.plugins.filamentreload.pause_print"> {{ _('Octoprint pause when out of filament') }}
             </label>
         </div>
         <div class="controls" data-toggle="tooltip" title="{{ _('With this option checked, the plugin will not allow the print to start or resume if it does not detect that filament is present.') }}">
